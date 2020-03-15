@@ -1,18 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define MAX 12
-void tryEveryResult(int *wA)
-{
+#include <stdbool.h>
+#define MAX 5
 
+_Bool tryEveryResult(int *wA ,int a ,int b ,int c ,int player ,int round)
+{
+    player++;
+    player %= 2;
+    printf("run %d %d %d pc:%d round:%d\n",a,b,c,player,round);
+    if (a == 0 && b == 0 && c == 0)
+    {
+        if (player == 1)
+        {
+            printf("輸了\n");
+            return false;  //輸
+        }
+        else
+        {
+            printf("贏了\n");
+            return true;  //贏
+        }
+    }
+    if (a > 1)
+        if (tryEveryResult(wA ,a-2 ,b ,c ,player ,++round))
+        {
+            printf("true\n");
+            wA[0] = 0;
+            wA[1] = 2;
+            if (round == 0) return true;
+        }else if (round != 0) return false;
+    if (b > 1)
+        if (tryEveryResult(wA ,a ,b-2 ,c ,player ,++round))
+        {
+            printf("true\n");
+            wA[0] = 1;
+            wA[1] = 2;
+            if (round == 0) return true;
+        }else if (round != 0) return false;
+    if (c > 1)
+        if (tryEveryResult(wA ,a ,b ,c-2 ,player ,++round))
+        {
+            printf("true\n");
+            wA[0] = 2;
+            wA[1] = 2;
+            if (round == 0) return true;
+        }else if (round != 0) return false;
+    if (a > 0)
+        if (tryEveryResult(wA ,a-1 ,b ,c ,player ,++round))
+        {
+            printf("true\n");
+            wA[0] = 0;
+            wA[1] = 1;
+            if (round == 0) return true;
+        }else if (round != 0) return false;
+    if (b > 0)
+        if (tryEveryResult(wA ,a ,b-1 ,c ,player ,++round))
+        {
+            printf("true\n");
+            wA[0] = 1;
+            wA[1] = 1;
+            if (round == 0) return true;
+        }else if(round != 0) return false;
+    if (c > 0)
+        if (tryEveryResult(wA ,a ,b ,c-1 ,player ,++round))
+        {
+            printf("true\n");
+            wA[0] = 2;
+            wA[1] = 1;
+            if (round == 0) return true;
+        }else if(round != 0) return false;
 }
 
 void computerDo (int *stack)
 {
     int wA[2];
     printf("電腦思考中...\n");
-
-    stack[wA[0]] -= wA[1];
+    if (tryEveryResult(wA ,stack[0] ,stack[1] ,stack[2] ,0,0))
+        stack[wA[0]] -= wA[1];
+    printf("%d %d %d\n",stack[0] ,stack[1] ,stack[2]);
 }
 
 void playerDo(int *stack)
