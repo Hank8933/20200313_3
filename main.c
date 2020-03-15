@@ -2,83 +2,94 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
-#define MAX 5
+#define MAX 3
 
-_Bool tryEveryResult(int *wA ,int a ,int b ,int c ,int player ,int round)
+_Bool tryEveryResult(int *wA ,int a ,int b ,int c)
 {
-    player++;
-    player %= 2;
-    printf("run %d %d %d pc:%d round:%d\n",a,b,c,player,round);
+    int flag = 1;
+    //printf("%d %d %d\n",a,b,c);
     if (a == 0 && b == 0 && c == 0)
     {
-        if (player == 1)
-        {
-            printf("輸了\n");
-            return false;  //輸
-        }
-        else
-        {
-            printf("贏了\n");
-            return true;  //贏
-        }
+        //printf("輸了\n");
+        return false;  //輸
     }
     if (a > 1)
-        if (tryEveryResult(wA ,a-2 ,b ,c ,player ,++round))
+        if (tryEveryResult(wA ,a-2 ,b ,c))
         {
-            printf("true\n");
-            wA[0] = 0;
-            wA[1] = 2;
-            if (round == 0) return true;
-        }else if (round != 0) return false;
+            flag = 0;
+        }
     if (b > 1)
-        if (tryEveryResult(wA ,a ,b-2 ,c ,player ,++round))
+        if (tryEveryResult(wA ,a ,b-2 ,c))
         {
-            printf("true\n");
-            wA[0] = 1;
-            wA[1] = 2;
-            if (round == 0) return true;
-        }else if (round != 0) return false;
+            flag = 0;
+        }
     if (c > 1)
-        if (tryEveryResult(wA ,a ,b ,c-2 ,player ,++round))
+        if (tryEveryResult(wA ,a ,b ,c-2))
         {
-            printf("true\n");
-            wA[0] = 2;
-            wA[1] = 2;
-            if (round == 0) return true;
-        }else if (round != 0) return false;
+            flag = 0;
+        }
     if (a > 0)
-        if (tryEveryResult(wA ,a-1 ,b ,c ,player ,++round))
+        if (tryEveryResult(wA ,a-1 ,b ,c))
         {
-            printf("true\n");
-            wA[0] = 0;
-            wA[1] = 1;
-            if (round == 0) return true;
-        }else if (round != 0) return false;
+            flag = 0;
+        }
     if (b > 0)
-        if (tryEveryResult(wA ,a ,b-1 ,c ,player ,++round))
+        if (tryEveryResult(wA ,a ,b-1 ,c))
         {
-            printf("true\n");
-            wA[0] = 1;
-            wA[1] = 1;
-            if (round == 0) return true;
-        }else if(round != 0) return false;
+            flag = 0;
+        }
     if (c > 0)
-        if (tryEveryResult(wA ,a ,b ,c-1 ,player ,++round))
+        if (tryEveryResult(wA ,a ,b ,c-1))
         {
-            printf("true\n");
-            wA[0] = 2;
-            wA[1] = 1;
-            if (round == 0) return true;
-        }else if(round != 0) return false;
+            flag = 0;
+        }
+    if (flag) {return true;}
 }
 
 void computerDo (int *stack)
 {
     int wA[2];
     printf("電腦思考中...\n");
-    if (tryEveryResult(wA ,stack[0] ,stack[1] ,stack[2] ,0,0))
-        stack[wA[0]] -= wA[1];
-    printf("%d %d %d\n",stack[0] ,stack[1] ,stack[2]);
+
+    if (stack[0] > 1)
+        if (!(tryEveryResult(wA ,stack[0]-2 ,stack[1] ,stack[2])))
+        {
+            stack[0] -= 2;
+            return;
+        }
+    if (stack[1] > 1)
+        if (!(tryEveryResult(wA ,stack[0] ,stack[1]-2 ,stack[2])))
+        {
+            stack[1] -= 2;
+            return;
+        }
+    if (stack[2] > 1)
+        if (!(tryEveryResult(wA ,stack[0] ,stack[1] ,stack[2]-2)))
+        {
+            stack[2] -= 2;
+            return;
+        }
+    if (stack[0] > 0)
+        if (!(tryEveryResult(wA ,stack[0]-1 ,stack[1] ,stack[2])))
+        {
+            stack[0] -= 1;
+            return;
+        }
+    if (stack[1] > 0)
+        if (!(tryEveryResult(wA ,stack[0] ,stack[1]-1 ,stack[2])))
+        {
+            stack[1] -= 1;
+            return;
+        }
+    if (stack[2] > 0)
+        if (!(tryEveryResult(wA ,stack[0] ,stack[1] ,stack[2]-1)))
+        {
+            stack[2] -= 1;
+            return;
+        }
+    if (stack[0] != 0) stack[0] -= 1;
+    else if (stack[1] != 0) stack[1] -= 1;
+    else stack[2] -= 1;
 }
 
 void playerDo(int *stack)
@@ -115,7 +126,7 @@ int main()
     {
         if (player) playerDo(stack);
         else computerDo(stack);
-
+        printf("%d %d %d\n",stack[0] ,stack[1] ,stack[2]);
         showStone(stack);
         if (stack[0] == 0 && stack[1] == 0 && stack[2] == 0) break;
         player++;
